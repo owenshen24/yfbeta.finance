@@ -1,11 +1,58 @@
+const Web3Modal = window.Web3Modal.default;
+const WalletConnectProvider = window.WalletConnectProvider.default;
+const Fortmatic = window.Fortmatic;
+let web3Modal, provider;
+
 $(document).ready(function() {
-    if(ethEnabled()) {
-        initializeWeb3();
-        initializeApplication();
-    } else {
-        alert("Please install MetaMask");
-    }
+    $('#btn-wallet-connect').on('click', async() => {
+        initWeb3Modal();
+        let didConnect = await onConnect();
+        if (didConnect) {
+            connectWallet(function() {
+                log('wallet connected: ' + account);
+                $('#btn-wallet-connect').attr('disabled', true);
+                $('#wallet-connect-display').html(account);
+                $('input[name="currentToken"]').removeAttr('disabled');
+                fetchAllBalances();
+            });
+            initializeWeb3();
+            initializeApplication();
+        }
+    });
 });
+
+const initWeb3Modal = () => {
+    const providerOptions = {
+        walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+                infuraId: "27e484dcd9e3efcfd25a83a78777cdf1"
+            }
+        },
+        fortmatic: {
+            package: Fortmatic,
+            options: {
+              key: "pk_live_5DFF7F46E1DE0704"
+            }
+        }
+    };
+    web3Modal = new Web3Modal({
+        cacheProvider: true, 
+        providerOptions, 
+        disableInjectedProvider: false, 
+    });
+}
+
+async function onConnect() {
+    try {
+        provider = await web3Modal.connect();
+        return true;
+    }
+    catch(e) {
+        alert("No web3 provider found");
+        return false;
+    }
+}
 
 let currentPool = false;
 let currentToken = false;
