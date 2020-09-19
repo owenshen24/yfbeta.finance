@@ -93,16 +93,6 @@ const initializeApplication = () => {
         poolAddresses[config['pool']] = config['poolAddress'];
     }
 
-    $('#btn-wallet-connect').on('click', function() {
-        connectWallet(function() {
-            log('wallet connected: ' + account);
-            $('#btn-wallet-connect').attr('disabled', true);
-            $('#wallet-connect-display').html(account);
-            $('input[name="currentPool"]').removeAttr('disabled');
-            fetchAllBalances();
-        })
-    });
-
     $('#btn-deposit').on('click', deposit);
     $('#btn-withdraw').on('click', withdraw);
     $('#btn-profits').on('click', profits);
